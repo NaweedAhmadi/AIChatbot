@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenAI Chat Interface</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    
+    .container {
+        width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .messages {
+        margin-bottom: 20px;
+    }
+    
+    .messages div {
+        margin-bottom: 10px;
+    }
+    
+    .input-container {
+        display: flex;
+        gap: 10px;
+    }
+    
+    input[type="text"] {
+        flex-grow: 1;
+        padding: 10px;
+    }
+    
+    button {
+        padding: 10px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Hello, this is AIChatbot</h1>
+  <div class="messages" id="messages">
+    <!-- Messages will appear here -->
+  </div>
+  <div class="input-container">
+    <input type="text" id="userMessage" placeholder="Ask me anything..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  async function sendMessage() {
+    const userMessage = document.getElementById('userMessage').value;
+    if (!userMessage) return;
+
+    // Display user message
+    const messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML += `<div><strong>User:</strong> ${userMessage}</div>`;
+    document.getElementById('userMessage').value = '';
+
+    // Send the message to the server
+    try {
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `message=${encodeURIComponent(userMessage)}`,
+      });
+
+      const data = await response.json();
+      messagesDiv.innerHTML += `<div><strong>AIChatbot:</strong> ${data.reply}</div>`;
+    } catch (error) {
+      console.error('Error:', error);
+      messagesDiv.innerHTML += `<div><strong>Error:</strong> Could not get a response.</div>`;
+    }
+  }
+</script>
+
+</body>
+</html>
